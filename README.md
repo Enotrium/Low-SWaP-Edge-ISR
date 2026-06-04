@@ -1,4 +1,4 @@
-# 🛡️ Weaponized SNN FPGA Accelerator for Low-SWaP Edge ISR
+#  SNN FPGA Accelerator for Low-SWaP Edge ISR
 
 > Event-Driven Spiking Neural Network accelerator hardened for defense autonomous systems.
 > Under $100 BOM, under 5W draw on XC7Z020 (PYNQ-Z2).
