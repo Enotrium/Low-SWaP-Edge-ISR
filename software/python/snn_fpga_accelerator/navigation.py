@@ -151,7 +151,8 @@ class GPSDeniedNav:
 
     def update_imu(self, accel: np.ndarray, gyro: np.ndarray, dt: float = 0.01) -> None:
         """Update from IMU measurements."""
-        self.velocity += accel[:2] * dt
+        self.velocity[0] += accel[0] * dt
+        self.velocity[1] += accel[1] * dt
         self.position.x += self.velocity[0] * dt
         self.position.y += self.velocity[1] * dt
         self.heading_deg += np.degrees(gyro[2]) * dt

@@ -337,7 +337,10 @@ class WeaponSNNAccelerator:
         threat_count = len([t for t in self.active_tracks.values() if not t.kill_confirmed])
 
         vector[0:16] = mission_val
-        vector[16:32] = (self.position[:16].astype(np.int8) > 0) * 2 - 1
+        # Pad position encoding to fill 16 elements
+        pos_bits = np.zeros(16, dtype=np.int8)
+        pos_bits[:3] = (self.position.astype(np.int8) > 0) * 2 - 1
+        vector[16:32] = pos_bits
         vector[32:48] = threat_count % 2 * 2 - 1
 
         self.swarm_vectors[self.drone_id] = vector
