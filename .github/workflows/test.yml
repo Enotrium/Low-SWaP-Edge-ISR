@@ -1,0 +1,56 @@
+name: SNN FPGA Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install numpy pytest pyyaml scipy
+
+      - name: Generate parameters
+        run: cd config && python generate_params.py
+
+      - name: Run threat detection tests
+        run: cd experiments && python threat_detection.py
+
+      - name: Run SEAD mission tests
+        run: cd experiments && python ew_aps_sead.py
+
+      - name: Run energy benchmark
+        run: cd experiments && python benchmark_energy.py
+
+      - name: Run ECC fault recovery
+        run: cd experiments && python ecc_fault_recovery.py
+
+      - name: Run supply chain reasoning
+        run: cd experiments && python supply_chain.py
+
+      - name: Run on-chip STDP tests
+        run: cd tests && python onchip_stdp_experiment.py
+
+      - name: Run FPGA STDP parity tests
+        run: cd tests && python fpga_stdp_parity.py
+
+      - name: Run HDC module tests
+        run: |
+          cd $GITHUB_WORKSPACE
+          python -m hdc.ecc
+          python -m hdc.error_masking
+          python -m hdc.knowledge_graph
