@@ -1,0 +1,65 @@
+# Vivado / FPGA
+*.bit
+*.dcp
+*.rpt
+*.log
+*.jou
+*.str
+*.xpr
+*.sim/
+*.hw*
+*.ip_user_files
+*.cache/
+*.runs/
+*.srcs/
+*.xsim/
+*_synth*/
+*_implement*/
+*.bmm
+*.lpr
+vivado_*
+.xil/
+
+# Vitis HLS
+*_hls*/
+*.autopilot
+vitis_hls.log
+*.prj/
+*solution*/
+*_csynth.rpt
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.vscode/
+.idea/
+
+# Outputs
+hardware/outputs/
+*.elf
+*.bit.bin
+*.mcs
+*.prm
+*.hdf
+
+# Simulator
+*.wlf
+*.vcd
+*.vstf
+transcript
+work/
+modelsim.ini
+vsim.wlf

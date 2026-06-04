@@ -1,0 +1,6 @@
+numpy>=1.21.0
+pynq>=2.7.0; sys_platform == "linux"
+pytest>=7.0.0
+pyyaml>=5.4.0
+matplotlib>=3.5.0
+scipy>=1.7.0
