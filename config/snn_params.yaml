@@ -1,0 +1,181 @@
+# =============================================================================
+# Weaponized SNN Accelerator — Hardware Configuration Parameters
+# =============================================================================
+# Extended from metr0jw's Event-Driven SNN Accelerator for defense-grade
+# autonomous systems: ISR, EW-resilient targeting, GPS-denied navigation,
+# swarm coordination, and active protection systems.
+#
+# All RTL, HLS, and Python modules derive parameters from this single source.
+# =============================================================================
+
+architecture:
+  # Core group configuration: 16 groups of 128 = 2048 neurons
+  # Extended addressing supports up to 4096 neurons for multi-sensor fusion
+  neurons_per_group: 128
+  group_sizes:
+    - 128  # Group 0:  Sensor frontend (radar/RWR)
+    - 128  # Group 1:  Sensor frontend (acoustic/EO)
+    - 128  # Group 2:  Sensor frontend (RF/COMINT)
+    - 128  # Group 3:  Sensor fusion layer
+    - 128  # Group 4:  Threat classification
+    - 128  # Group 5:  Threat classification
+    - 128  # Group 6:  Countermeasure selection
+    - 128  # Group 7:  Navigation (GPS-denied)
+    - 128  # Group 8:  Path planning
+    - 128  # Group 9:  Swarm coordination
+    - 128  # Group 10: EW countermeasure generation
+    - 128  # Group 11: Active protection (APS)
+    - 128  # Group 12: Knowledge graph reasoning
+    - 128  # Group 13: Reserve / mission-specific
+    - 128  # Group 14: Reserve
+    - 128  # Group 15: Output / actuator interface
+  max_fanout_inter: 32        # Extended for multi-group connections
+  spike_buffer_depth: 128     # Deeper for burst scenarios
+  num_parallel_units: 8       # DSP48E1 parallelism
+
+neuron_groups:
+  - name: "sensor_radar"         # Radar warning receiver / AESA input
+    size: 128
+  - name: "sensor_acoustic"      # Acoustic gunshot / engine detection
+    size: 128
+  - name: "sensor_rf"            # RF communications / ELINT
+    size: 128
+  - name: "sensor_fusion"        # Multi-sensor fusion layer
+    size: 128
+  - name: "threat_class_0"       # Threat type classification (A)
+    size: 128
+  - name: "threat_class_1"       # Threat type classification (B)
+    size: 128
+  - name: "countermeasure"       # CM selection & prioritization
+    size: 128
+  - name: "navigation"           # GPS-denied position estimation
+    size: 128
+  - name: "path_planning"        # Mission/path planning under uncertainty
+    size: 128
+  - name: "swarm_coord"          # Multi-agent swarm coordination
+    size: 128
+  - name: "ew_cm_generation"     # Electronic attack waveform generation
+    size: 128
+  - name: "active_protection"    # APS fire control / intercept
+    size: 128
+  - name: "knowledge_graph"      # Mission knowledge graph reasoning
+    size: 128
+  - name: "reserve_1"
+    size: 128
+  - name: "reserve_2"
+    size: 128
+  - name: "actuator_output"      # Effector commands, weapon release
+    size: 128
+
+connections:
+  # Sensor → Fusion
+  - src_group: 0   dst_group: 3   # radar → fusion
+  - src_group: 1   dst_group: 3   # acoustic → fusion
+  - src_group: 2   dst_group: 3   # RF → fusion
+  # Fusion → Classification
+  - src_group: 3   dst_group: 4   # fusion → threat_class_0
+  - src_group: 3   dst_group: 5   # fusion → threat_class_1
+  # Classification → Countermeasure
+  - src_group: 4   dst_group: 6   # threat_class_0 → countermeasure
+  - src_group: 5   dst_group: 6   # threat_class_1 → countermeasure
+  # Classification → Navigation threat overlay
+  - src_group: 4   dst_group: 7   # threat_class_0 → navigation (threat overlay)
+  - src_group: 5   dst_group: 7   # threat_class_1 → navigation
+  # Navigation → Path Planning
+  - src_group: 7   dst_group: 8   # navigation → path_planning
+  # Countermeasure → EW Generation
+  - src_group: 6   dst_group: 10  # countermeasure → ew_cm_generation
+  # Countermeasure → APS
+  - src_group: 6   dst_group: 11  # countermeasure → active_protection
+  # Swarm Interconnect
+  - src_group: 9   dst_group: 8   # swarm_coord → path_planning (deconflict)
+  - src_group: 9   dst_group: 6   # swarm_coord → countermeasure
+  # Knowledge Graph → Planning
+  - src_group: 12  dst_group: 8   # knowledge_graph → path_planning
+  # Outputs
+  - src_group: 8   dst_group: 15  # path_planning → actuator
+  - src_group: 10  dst_group: 15  # ew_cm → actuator
+  - src_group: 11  dst_group: 15  # aps → actuator
+  # Feedback / Recurrent (continual learning)
+  - src_group: 6   dst_group: 3   # countermeasure → fusion (attention)
+  - src_group: 11  dst_group: 4   # aps → threat_class_0 (reinforcement)
+  # Swarm relay (compressed HD vectors)
+  - src_group: 9   dst_group: 9   # swarm_coord → swarm_coord (multi-agent loop)
+
+weights:
+  # Extended weight representation: 9-bit = 8-bit magnitude + 1-bit exc/inh
+  max_weight: 255
+  min_weight: 0
+  weight_with_flag_width: 9
+
+widths:
+  data_width: 16            # Membrane potential (unsigned)
+  weight_width: 8           # Synaptic weight magnitude
+  threshold_width: 16       # Firing threshold
+  leak_width: 8             # Leak rate (shift-based)
+  refrac_width: 8           # Refractory period counter
+
+# --- Defense-Specific Extensions ---
+
+defense:
+  # Electronic Warfare / Countermeasure
+  ew:
+    enabled: true
+    pulse_repetition_interval: 1000  # ns (adaptive PRI for jamming)
+    frequency_hopping_channels: 128
+    drfm_capture_depth: 4096         # Digital RF memory samples
+    deception_waveform_types:
+      - "range_gate_pull_off"
+      - "velocity_gate_pull_off"
+      - "inverse_amplitude_modulation"
+      - "cross_eye_jamming"
+      - "saturation_noise"
+
+  # Active Protection System
+  aps:
+    enabled: true
+    intercept_latency_ns: 500        # Bounded microsecond-level latency
+    aoa_bins: 64                     # Angle-of-arrival resolution bins
+    ranging_bins: 256                # Range resolution bins
+    simultaneous_tracks: 32          # Concurrent threat tracking
+    hard_kill_actuation_cycles: 100  # HLS cycles to trigger effector
+
+  # Swarm Coordination
+  swarm:
+    enabled: true
+    max_drones: 16
+    hd_vector_dim: 512               # Hyperdimensional vector dimension
+    hd_bits_per_dim: 1               # Binary HD vectors for bandwidth
+    consensus_period_us: 1000        # Swarm consensus interval
+    relay_spread_spectrum: true      # FHSS/LPI for swarm comms
+
+  # Continual Learning
+  continual_learning:
+    enabled: true
+    stdp_learning_rate: 0.01
+    stdp_tau_pre: 20                 # Pre-synaptic trace time constant (ms)
+    stdp_tau_post: 40                # Post-synaptic trace time constant (ms)
+    trace_decay_bits: 8
+    adaptation_samples: 50           # Samples to adapt to new class
+    concept_drift_detection: true
+
+  # Error Correction / Fault Tolerance
+  ecc:
+    enabled: true
+    hamming_parity_bits: 4           # (12,8) Hamming code
+    seu_detection: true
+    triple_modular_redundancy: false  # TMR for mission-critical FSM
+    watchdog_timer_cycles: 100000    # Watchdog timeout at 100MHz = 1ms
+
+  # Navigation
+  navigation:
+    gps_denied: true
+    slam_cells: 1024                 # Spatial cells for cognitive map
+    angle_bins: 360                  # Degrees in circular angle encoder
+    imu_fusion_rate_hz: 100          # IMU update rate
+    optical_flow_enabled: true
+
+target:
+  fpga_part: "xc7z020clg400-1"
+  clock_period_ns: 10       # 100 MHz
+  board: "tul.com.tw:pynq-z2:part0:1.0"
