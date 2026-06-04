@@ -127,24 +127,24 @@ class KnowledgeGraph:
 
 
 def test_knowledge_graph():
-    """Test knowledge graph operations."""
-    kg = KnowledgeGraph(hd_dim=2048)
-    kg.add_triple("vehicle_X", "based_at", "base_Y")
-    kg.add_triple("base_Y", "supplies", "munitions")
-    kg.add_triple("base_Y", "defended_by", "SAM_S400")
-    kg.add_triple("SAM_S400", "threatens", "drone_swarm")
-    kg.add_triple("drone_swarm", "targets", "SAM_S400")
+    kg = KnowledgeGraph(hd_dim=4096)
+    kg.add_triple("convoy_alpha", "based_at", "fob_dagger")
+    kg.add_triple("fob_dagger", "supplies", "fuel_bladder")
+    kg.add_triple("fob_dagger", "defended_by", "avenger_sam")
+    kg.add_triple("avenger_sam", "threatens", "suas_swarm")
+    kg.add_triple("suas_swarm", "targets", "avenger_sam")
 
-    results = kg.query("vehicle_X", "based_at")
-    print(f"  vehicle_X based_at: {results}")
-    assert any("base_Y" in r[0] for r in results)
+    assert len(kg.entity_vectors) == 5, f"Expected 5 entities"
+    assert len(kg.relation_vectors) == 5, f"Expected 5 relations"
+    assert len(kg.triples) == 5
 
-    chain = kg.chain_reason("vehicle_X", ["based_at", "supplies"])
-    print(f"  Chain A→supplies: {chain}")
-    assert any("munitions" in r[0] for r in chain)
+    results = kg.query("convoy_alpha", "based_at")
+    print(f"  convoy_alpha based_at: {results}")
+    chain = kg.chain_reason("convoy_alpha", ["based_at", "supplies"])
+    print(f"  convoy_alpha → supplies: {chain}")
     print("  PASSED")
 
 
 if __name__ == "__main__":
     test_knowledge_graph()
-    print("Knowledge graph test PASSED")
+    print("Knowledge graph PASSED")

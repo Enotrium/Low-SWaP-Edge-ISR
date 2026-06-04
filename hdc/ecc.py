@@ -85,3 +85,14 @@ class Hamming128:
             if corrected:
                 error_count += 1
         return recovered, error_count
+
+
+if __name__ == "__main__":
+    ok = 0
+    for d in range(256):
+        enc = Hamming128.encode_byte(d)
+        dec, corr, dbl = Hamming128.decode_byte(enc)
+        if not dbl and dec == d:
+            ok += 1
+    assert ok == 256, f"Roundtrip: {ok}/256"
+    print(f"ECC self-test PASSED ({ok}/256 roundtrip)")
