@@ -31,7 +31,7 @@ Event-driven processing: power consumed **only when spikes occur** — critical 
 
 - `benchmark.py` → `experiments/benchmark_energy.py` → `hdc/efficiency.py`
 
-### 2. On-Chip Continual Learning (Comms-Denied)
+### 2. On-Chip Continual Learning 
 Update decision boundaries **without transmitting data** — no RF emissions to intercept, no satellite link dependency.
 
 - `experiments/threat_detection.py` lines 7-26: concept drift, adversarial perturbation, 50-sample adaptation
