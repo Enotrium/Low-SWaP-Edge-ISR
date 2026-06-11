@@ -5,6 +5,34 @@
 
 ---
 
+## SWaP Profile
+
+| Dimension | Value | Provenance |
+|---|---|---|
+| Platform | AMD/Xilinx Zynq-7020 (XC7Z020-1CLG400C), PYNQ-Z2 carrier | `hardware/constraints/pynq_z2.xdc` |
+| Flight integration | COTS dev board; optional custom ISR payload PCB | `docs/deployment.md` |
+| Power (subsystem budget) | ≈1.41 W estimated, full breakdown per block | `docs/architecture.md` § Power Budget |
+| Power (platform envelope) | <5 W target incl. board overhead; 5 V / 3 A input | `docs/deployment.md` |
+| Cost | <$100 FPGA BOM target | — |
+| Compute fabric | 2048 LIF neurons (16 groups × 128), 100 MHz, 16-bit membrane / 8-bit weights, on-chip STDP | `config/snn_params.yaml` |
+| HD encoding | 512-dim hypervector swarm encoder | `hardware/hdl/rtl/weapon_systems/hd_swarm_encoder.v` |
+| Inference latency | <100 cycles target (<1 µs @ 100 MHz) | Performance Targets below |
+
+**Inference task:** event-driven multi-sensor ISR — spike-encoded RWR / acoustic / RF streams → SNN threat classification and tracking, with HDC cognitive-map navigation for GPS-denied operation and HD-vector swarm state sharing.
+
+> ⚠️ Power and latency figures are **design estimates**, not measured silicon numbers. Post-synthesis and on-board measurements are pending; reproducible runs will be committed to the org [`evaluations`](https://github.com/Enotrium/evaluations) repo (`benchmark.py` → `experiments/benchmark_energy.py` → `hdc/efficiency.py`).
+
+## Arthedain Platform Integration
+
+This repo is the **hardware deployment tier of [Arthedain](https://github.com/Enotrium/arthedain)**, Enotrium's edge SNN/HDC platform:
+
+- **Models** are developed and trained in Arthedain (Python/PyTorch, 125+ HDC modules). The `hdc/` package here mirrors `arthedain/hdc/` module-for-module (`cognitive_map`, `planner`, `multi_agent_hdc`, `multimodal_hdc`, `ecc`, `error_masking`, …).
+- **Parameters** flow through `config/generate_params.py`, which emits matched Verilog (`.vh`), Python, and C/HLS headers from one `snn_params.yaml` — software and fabric stay in lockstep.
+- **Execution** happens in this repo's RTL (`hardware/hdl/`) and Vitis HLS (`hardware/hls/`) implementations on the Zynq fabric.
+- **Roadmap:** the hand-written Verilog here is slated to be superseded by generated, type-verified RTL from [Osgiliath](https://github.com/Enotrium/Osgiliath)'s `clash-hdc`.
+
+---
+
 ## Architecture
 
 ```
