@@ -1,7 +1,7 @@
 # Adversarial Threat Model
 
 ## Assumed Threat Environment
-The weaponized SNN accelerator operates in contested electromagnetic environments:
+The SNN accelerator operates in contested electromagnetic environments:
 - Radar warning receivers (RWR) detecting SAM/AAA radar
 - Acoustic sensors detecting gunfire and vehicle signatures
 - RF/COMINT intercept of adversary communications
