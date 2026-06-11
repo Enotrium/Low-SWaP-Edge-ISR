@@ -1,4 +1,4 @@
-# Weaponized SNN FPGA Accelerator — Configuration Parameters
+# SNN FPGA Accelerator — Configuration Parameters
 # Auto-generates: Verilog (.vh), Python (.py), C++ (.h) headers
 
 ## ── SNN Architecture ──

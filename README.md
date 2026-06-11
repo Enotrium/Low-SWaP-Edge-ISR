@@ -21,6 +21,12 @@
 **Inference task:** event-driven multi-sensor ISR — spike-encoded RWR / acoustic / RF streams → SNN threat classification and tracking, with HDC cognitive-map navigation for GPS-denied operation and HD-vector swarm state sharing.
 
 > ⚠️ Power and latency figures are **design estimates**, not measured silicon numbers. Post-synthesis and on-board measurements are pending; reproducible runs will be committed to the org [`evaluations`](https://github.com/Enotrium/evaluations) repo (`benchmark.py` → `experiments/benchmark_energy.py` → `hdc/efficiency.py`).
+>
+> The org-level **~2.5 mW / 12.9 nJ-per-inference** figures are a *different design at a different scope*: the minimal Arthedain inference core on Artix-7 at a 10 MHz clock, pre-layout projection (see `arthedain/results/RESULTS.md` and `arthedain/hardware/FPGA_Mapping.md`). This repo's ≈1.41 W budget covers the full 100 MHz Zynq system — 16 neuron groups plus routing, encoding, and I/O. The two numbers do not contradict; they answer different questions.
+
+## Scope & Maturity
+
+The validated focus of this repo is **low-SWaP neuromorphic ISR compute**: event-driven sensing, threat classification/tracking, GPS-denied navigation, and swarm state sharing. The EW-waveform and effector-control modules (`hardware/hdl/rtl/weapon_systems/`) are **early-stage research code exercised only in simulation** — no autonomous-engagement capability is claimed or validated, and any effector path is gated by the hardware safety interlocks in `docs/safety.md` (ARM + AUTO_ENGAGE two-step, watchdog). Capability statements outside the SWaP/ISR profile above are design intent, not demonstrated function.
 
 ## Arthedain Platform Integration
 
@@ -55,7 +61,7 @@ This repo is the **hardware deployment tier of [Arthedain](https://github.com/En
 ## Key Capabilities
 
 ### 1. Low-SWaP Edge ISR
-Event-driven processing: power consumed **only when spikes occur** — critical for battery-constrained loitering drones. Process EO/IR or RF sensor data for **days instead of hours** on the same battery.
+Event-driven processing: power consumed **only when spikes occur** — critical for battery-constrained drone platforms. Process EO/IR or RF sensor data for **days instead of hours** on the same battery.
 
 - `benchmark.py` → `experiments/benchmark_energy.py` → `hdc/efficiency.py`
 
@@ -88,7 +94,7 @@ Update decision boundaries **without transmitting data** — no RF emissions to 
 
 ---
 
-## Concrete SEAD Mission Pipeline
+## Contested-Environment Mission Pipeline (simulation scenario)
 
 ```
 Sense → Identify → Localize → Plan → Coordinate → Adapt
@@ -201,7 +207,7 @@ python onchip_stdp_experiment.py   # STDP validation
 | 0x40    | SWARM_STATE    | Drone role/state vector         |
 | 0x44    | MISSION_STATE  | 0=standby, 1=search, 2=track... |
 | 0x20    | STATUS         | ECC errors, FIFO overflow, etc. |
-| 0x28    | VERSION        | "SNN" v2 (weaponized)           |
+| 0x28    | VERSION        | "SNN" v2                        |
 
 ## Performance Targets
 

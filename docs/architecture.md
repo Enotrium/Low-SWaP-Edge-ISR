@@ -1,8 +1,8 @@
-# Weaponized SNN FPGA Accelerator — Architecture
+# SNN FPGA Accelerator — Architecture
 
 ## System Overview
 
-This accelerator integrates an event-driven Spiking Neural Network with defense subsystems on a <$100 FPGA (XC7Z020). The design targets low-SWaP autonomous platforms (drones, loitering munitions) operating in contested electromagnetic environments.
+This accelerator integrates an event-driven Spiking Neural Network with defense subsystems on a <$100 FPGA (XC7Z020). The design targets small unmanned aircraft and other low-SWaP autonomous platforms operating in contested electromagnetic environments.
 
 ## Neuron Group Allocation
 

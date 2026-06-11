@@ -1,4 +1,4 @@
-# AXI4-Lite Register Map — Weaponized SNN
+# AXI4-Lite Register Map — SNN Accelerator
 
 Base address: 0x43C0_0000
 
