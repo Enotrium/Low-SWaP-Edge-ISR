@@ -11,9 +11,10 @@
 
 ### 1. FPGA Bitstream
 ```bash
-cd hardware/scripts
-cpu generate_params.py    # Generate Verilog/Python/C headers
-vivado -source build_civado.tcl
+cd config
+python generate_params.py    # Generate Verilog/Python/C headers
+cd ../hardware/scripts
+vivado -source build_vivado.tcl
 # Output: hardware/outputs/weapon_snn.bit
 ```
 
